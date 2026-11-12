@@ -1,0 +1,52 @@
+[
+  {
+    "kode": "GA",
+    "nama": "Garuda Indonesia",
+    "harga": 1500000,
+    "jadwal": [
+      {"waktu": "08:00", "kursi_terisi": ["A1", "B2"]},
+      {"waktu": "13:00", "kursi_terisi": []},
+      {"waktu": "19:00", "kursi_terisi": ["C3"]}
+    ]
+  },
+  {
+    "kode": "JT",
+    "nama": "Lion Air",
+    "harga": 900000,
+    "jadwal": [
+      {"waktu": "06:30", "kursi_terisi": []},
+      {"waktu": "11:00", "kursi_terisi": ["A1"]},
+      {"waktu": "16:45", "kursi_terisi": []}
+    ]
+  },
+  {
+    "kode": "QG",
+    "nama": "Citilink",
+    "harga": 850000,
+    "jadwal": [
+      {"waktu": "07:15", "kursi_terisi": []},
+      {"waktu": "12:30", "kursi_terisi": ["D1", "D2"]},
+      {"waktu": "18:00", "kursi_terisi": []}
+    ]
+  },
+  {
+    "kode": "ID",
+    "nama": "Batik Air",
+    "harga": 1100000,
+    "jadwal": [
+      {"waktu": "09:00", "kursi_terisi": []},
+      {"waktu": "14:30", "kursi_terisi": ["B1"]},
+      {"waktu": "20:15", "kursi_terisi": []}
+    ]
+  },
+  {
+    "kode": "IW",
+    "nama": "Wings Air",
+    "harga": 750000,
+    "jadwal": [
+      {"waktu": "05:45", "kursi_terisi": []},
+      {"waktu": "10:20", "kursi_terisi": []},
+      {"waktu": "15:50", "kursi_terisi": ["A3", "B3"]}
+    ]
+  }
+]
