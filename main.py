@@ -72,7 +72,7 @@ while True:
     print('4. Ubah Pesanan')
     print('5. Batalkan Pesanan')
     print('6. Keluar')
-    print('')
+    print('===============================')
     inputMenu = input('Masukkan pilihan menu (1-6): ')
     if inputMenu == '1': # Show list of airlines
         print('Urutkan berdasarkan: ')
