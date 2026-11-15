@@ -21,6 +21,11 @@ def sortMaskapai(daftar, kunci):
                 hasil[j], hasil[j + 1] = hasil[j + 1], hasil[j]
     return hasil
 
+def tampilkanKodeMaskapai(daftar):
+    print('DAFTAR KODE MASKAPAI')
+    for m in daftar:
+        print(m['kode'], '-', m['nama'])
+
 def searchMaskapai(daftar, kata):
     hasil = []
     for m in daftar:
@@ -103,15 +108,14 @@ while True:
                 tampilkanMaskapai(hasil)
 
         elif inputCari == '2':
-            kode = input('Masukkan kode: ').strip().upper()
             terurut = quickSort(daftarMaskapai, 'kode')
+            tampilkanKodeMaskapai(terurut)
+            kode = input('Masukkan kode: ').strip().upper()
             hasil = binarySearchKode(terurut, kode)
             if hasil == None:
                 print('Maskapai tidak ditemukan.')
             else:
                 tampilkanMaskapai([hasil])
-        else:
-            print('Pilihan tidak valid.')
     elif inputMenu == '6': # Exit the program
         print('Terima kasih telah menggunakan Bookplane!')
         break
