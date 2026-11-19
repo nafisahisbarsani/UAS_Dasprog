@@ -13,7 +13,7 @@ def tampilkanMaskapai(daftar):
     for i in range(len(daftar)):
         print(i + 1, daftar[i]['nama'], formatRupiah(daftar[i]['harga']))
 
-def sortMaskapai(daftar, kunci):
+def urutMaskapai(daftar, kunci):
     hasil = daftar.copy()
     for i in range(len(hasil) - 1):
         for j in range(len(hasil) - 1 - i):
@@ -26,7 +26,7 @@ def tampilkanKodeMaskapai(daftar):
     for m in daftar:
         print(m['kode'], '-', m['nama'])
 
-def searchMaskapai(daftar, kata):
+def cariMaskapai(daftar, kata):
     hasil = []
     for m in daftar:
         if kata.lower() in m['nama'].lower():
@@ -60,7 +60,89 @@ def binarySearchKode(daftar_terurut, kode):
     return None
 # Function to format the price in Indonesian Rupiah format
 def formatRupiah(angka):
-    return f'Rp {angka:,}'.replace(',', '.')
+    return f'Rp{angka:,}'.replace(',', '.')
+
+def kembaliKeMenu():
+    input('\nTekan Enter untuk kembali ke menu utama...')
+
+def buatDaftarKursi():
+    daftar = []
+    for i in range(1, 4):
+        for huruf in ['A', 'B', 'C', 'D']:
+            daftar.append(f'{huruf}{i}')
+    return daftar
+
+def tampilkanDenahKursi(jadwal):
+    print('DENAH KURSI ( X = Terisi')
+    for kursi in buatDaftarKursi():
+        if kursi in jadwal['kursi_terisi']:
+            print('X', end=' ')
+        else:
+            print('[' + kursi + ']', end=' ')
+        if kursi.startswith('D'):
+            print()
+
+def pilihKursi(jadwal):
+    semuaKursi = buatDaftarKursi()
+    while True:
+        kursi = input('Pilih kursi: ').strip().upper()
+        if kursi not in semuaKursi:
+            print('Kursi tidak ada')
+        elif kursi in jadwal['kursi_terisi']:
+            print('Kursi sudah terisi')
+        else:
+            return kursi
+
+def pilihJadwal(maskapai):
+    print('Jadwal', maskapai['nama'])
+    for i in range(len(maskapai['jadwal'])):
+        print(i + 1, maskapai['jadwal'][i]['waktu'])
+    while True:
+        try:
+            pilihan = int(input('Masukan nomor jadwal yang ingin dipilih: '))
+            if 1 <= pilihan <= len(maskapai['jadwal']):
+                return maskapai['jadwal'][pilihan - 1]
+            else:
+                print('Pilihan tidak valid.')
+        except ValueError:
+            print('Input harus berupa angka, coba lagi')
+
+def konfirmasi(pertanyaan):
+    while True:
+        jawab = input(pertanyaan + ' (y/n): ').strip().lower()
+        if jawab == 'y':
+            return True
+        elif jawab == 'n':
+            return False
+        else:
+            print('Masukan y untuk ya atau n untuk tidak.')
+
+def inputNama():
+    while True:
+        nama = input('Masukan nama: ').strip()
+        if nama.replace(' ', '').isalpha():
+            return nama.title()
+        else:
+            print('Nama hanya boleh berisi huruf')
+
+def buatKodeTiket():
+    terbesar = 0
+    for p in daftarPesanan:
+        nomor = int(p['kode_tiket'].split('-')[1])
+        if nomor > terbesar:
+            terbesar = nomor
+    return kodeMaskapai + '-' + str(terbesar + 1).zfill(4)
+
+def tampilkanTiket(pesanan):
+    print('================================')
+    print('TIKET PESAWAT'.center(40))
+    print('================================')
+    print('Kode Tiket:', pesanan['kode_tiket'])
+    print('Nama Penumpang:', pesanan['nama_penumpang'])
+    print('Maskapai:', pesanan['maskapai'])
+    print('Jadwal:', pesanan['jadwal'])
+    print('Kursi:', pesanan['kursi'])
+    print('Harga:', formatRupiah(pesanan['harga']))
 
 daftarMaskapai = loadData('data/maskapai.json')
 daftarPesanan = loadData('data/pesanan.json')
@@ -77,7 +159,7 @@ while True:
     print('4. Ubah Pesanan')
     print('5. Batalkan Pesanan')
     print('6. Keluar')
-    print('===============================')
+    print('')
     inputMenu = input('Masukkan pilihan menu (1-6): ')
     if inputMenu == '1': # Show list of airlines
         print('Urutkan berdasarkan: ')
@@ -86,13 +168,15 @@ while True:
         print('3. Tanpa Urutan')
         inputUrut = input('Masukkan pilihan (1-3): ')
         if inputUrut == '1':
-            tampilkanMaskapai(sortMaskapai(daftarMaskapai, 'nama'))
+            tampilkanMaskapai(urutMaskapai(daftarMaskapai, 'nama'))
         elif inputUrut == '2':
-            tampilkanMaskapai(sortMaskapai(daftarMaskapai, 'harga'))
+            tampilkanMaskapai(urutMaskapai(daftarMaskapai, 'harga'))
         elif inputUrut == '3':
             tampilkanMaskapai(daftarMaskapai)
         else:
             print('Pilihan tidak valid.')
+        kembaliKeMenu()
+
     elif inputMenu == '2': # Search for airlines
         print('Cari berdasarkan:')
         print('1. Nama')
@@ -101,7 +185,7 @@ while True:
 
         if inputCari == '1':
             kata = input('Masukkan nama: ').strip()
-            hasil = searchMaskapai(daftarMaskapai, kata)
+            hasil = cariMaskapai(daftarMaskapai, kata)
             if len(hasil) == 0:
                 print('Maskapai tidak ditemukan.')
             else:
@@ -116,8 +200,55 @@ while True:
                 print('Maskapai tidak ditemukan.')
             else:
                 tampilkanMaskapai([hasil])
+        else:
+            print('Pilihan tidak valid.')
+        kembaliKeMenu()
+    
+    elif inputMenu == '3': # Book a ticket
+        tampilkanMaskapai(daftarMaskapai)
+        m = daftarMaskapai[pilihNomor('Pilih maskapai', len(daftarMaskapai))]
+
+        print('Jadwal', m['nama'])
+        for i in range(len(m['jadwal'])):
+            print(i + 1, m['jadwal'][i]['waktu'])
+        jadwal = m['jadwal'][pilihNomor('Pilih jadwal', len(m['jadwal']))]
+
+        if len(jadwal['kursi_terisi']) == len(buatDaftarKursi()):
+            print('Maaf, penerbangan ini sudah penuh. Silakan pilih jadwal lain.')
+        else:
+            tampilkanDenahKursi(jadwal)
+            kursi = pilihKursi(jadwal)
+
+            print('===============================')
+            print('Konfirmasi Pemesanan'.center(40))
+            print('Maskapai:', m['nama'])
+            print('Jadwal:', jadwal['waktu'])
+            print('Kursi:', kursi)
+            print('Harga:', formatRupiah(m['harga']))
+            print('===============================')
+            if konfirmasi('Apakah Anda ingin melanjutkan pemesanan?'):
+                nama = inputNama()
+                pesananBaru = {
+                    'kode_tiket': buatKodeTiket(m['kode'], daftarPesanan),
+                    'nama_penumpang': nama,
+                    'maskapai': m['nama'],
+                    'jadwal': jadwal['waktu'],
+                    'kursi': kursi,
+                    'harga': m['harga']
+                }
+                daftarPesanan.append(pesananBaru)
+                jadwal['kursi_terisi'].append(kursi)
+                simpanData('data/pesanan.json', daftarPesanan)
+                simpanData('data/maskapai.json', daftarMaskapai)
+
+                tampilkanTiket(pesananBaru)
+            else:
+                print('Pemesanan dibatalkan.')
+            kembaliKeMenu()
+
     elif inputMenu == '6': # Exit the program
         print('Terima kasih telah menggunakan Bookplane!')
         break
+    
     else:
         print('Pilihan tidak valid, coba lagi.')
