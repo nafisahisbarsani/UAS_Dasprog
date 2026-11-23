@@ -76,7 +76,7 @@ def tampilkanDenahKursi(jadwal):
     print('DENAH KURSI ( X = Terisi')
     for kursi in buatDaftarKursi():
         if kursi in jadwal['kursi_terisi']:
-            print('X', end=' ')
+            print('[X]', end=' ')
         else:
             print('[' + kursi + ']', end=' ')
         if kursi.startswith('D'):
@@ -93,6 +93,18 @@ def pilihKursi(jadwal):
         else:
             return kursi
 
+def pilihMaskapai(daftar):
+    tampilkanMaskapai(daftar)
+    while True:
+        try:
+            pilihan = int(input('Masukkan nomor maskapai yang ingin dipilih: '))
+            if 1 <= pilihan <= len(daftar):
+                return daftar[pilihan - 1]
+            else:
+                print('Pilihan tidak valid.')
+        except ValueError:
+            print('Input harus berupa angka, coba lagi')
+            
 def pilihJadwal(maskapai):
     print('Jadwal', maskapai['nama'])
     for i in range(len(maskapai['jadwal'])):
@@ -125,7 +137,7 @@ def inputNama():
         else:
             print('Nama hanya boleh berisi huruf')
 
-def buatKodeTiket():
+def buatKodeTiket(kodeMaskapai, daftarPesanan):
     terbesar = 0
     for p in daftarPesanan:
         nomor = int(p['kode_tiket'].split('-')[1])
@@ -205,14 +217,8 @@ while True:
         kembaliKeMenu()
     
     elif inputMenu == '3': # Book a ticket
-        tampilkanMaskapai(daftarMaskapai)
-        m = daftarMaskapai[pilihNomor('Pilih maskapai', len(daftarMaskapai))]
-
-        print('Jadwal', m['nama'])
-        for i in range(len(m['jadwal'])):
-            print(i + 1, m['jadwal'][i]['waktu'])
-        jadwal = m['jadwal'][pilihNomor('Pilih jadwal', len(m['jadwal']))]
-
+        m = pilihMaskapai(daftarMaskapai)
+        jadwal = pilihJadwal(m)
         if len(jadwal['kursi_terisi']) == len(buatDaftarKursi()):
             print('Maaf, penerbangan ini sudah penuh. Silakan pilih jadwal lain.')
         else:
