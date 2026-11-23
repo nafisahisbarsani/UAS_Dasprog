@@ -156,6 +156,97 @@ def tampilkanTiket(pesanan):
     print('Kursi:', pesanan['kursi'])
     print('Harga:', formatRupiah(pesanan['harga']))
 
+def cariPesanan(daftar, kode):
+    for p in daftar:
+        if p['kode_tiket'] == kode:
+            return p
+    return None
+
+def cariMaskapaiByNama(daftar, nama):
+    for m in daftar:
+        if m['nama'] == nama:
+            return m
+    return None
+
+def cariJadwalByWaktu(maskapai, waktu):
+    for j in maskapai['jadwal']:
+        if j['waktu'] == waktu:
+            return j
+    return None
+
+def konfirmasiPerubahan(pesanan, maskapai, jadwal, kursi):
+    print('===============================')
+    print('Konfirmasi Perubahan'.center(40))
+    print('Maskapai:', pesanan['maskapai'], '->', maskapai['nama'])
+    print('Jadwal:', pesanan['jadwal'], '->', jadwal['waktu'])
+    print('Kursi:', pesanan['kursi'], '->', kursi)
+    print('Harga:', formatRupiah(pesanan['harga']), '->', formatRupiah(maskapai['harga']))
+    print('===============================')
+    return konfirmasi('Apakah Anda ingin menyimpan perubahan?')
+
+def pindahkanPesanan(daftarMaskapai, pesanan, maskapaiBaru, jadwalBaru, kursiBaru):
+    # Kosongkan kursi lama
+    maskapaiLama = cariMaskapaiByNama(daftarMaskapai, pesanan['maskapai'])
+    jadwalLama = cariJadwalByWaktu(maskapaiLama, pesanan['jadwal'])
+    if pesanan['kursi'] in jadwalLama['kursi_terisi']:
+        jadwalLama['kursi_terisi'].remove(pesanan['kursi'])
+
+    # Isi kursi baru
+    jadwalBaru['kursi_terisi'].append(kursiBaru)
+
+    # Perbarui data pesanan (nomor urut tiket tetap, hanya kode maskapai yang berganti)
+    nomor = pesanan['kode_tiket'].split('-')[1]
+    pesanan['kode_tiket'] = maskapaiBaru['kode'] + '-' + nomor
+    pesanan['maskapai'] = maskapaiBaru['nama']
+    pesanan['jadwal'] = jadwalBaru['waktu']
+    pesanan['kursi'] = kursiBaru
+    pesanan['harga'] = maskapaiBaru['harga']
+
+def pilihJadwalDanKursi(maskapai):
+    jadwal = pilihJadwal(maskapai)
+    if len(jadwal['kursi_terisi']) == len(buatDaftarKursi()):
+        print('Maaf, penerbangan ini sudah penuh. Silakan pilih jadwal lain.')
+        return None, None
+    tampilkanDenahKursi(jadwal)
+    kursi = pilihKursi(jadwal)
+    return jadwal, kursi
+
+def ubahNama(pesanan):
+    pesanan['nama_penumpang'] = inputNama()
+    return True
+
+def ubahKursi(daftarMaskapai, pesanan):
+    maskapai = cariMaskapaiByNama(daftarMaskapai, pesanan['maskapai'])
+    jadwal = cariJadwalByWaktu(maskapai, pesanan['jadwal'])
+    tampilkanDenahKursi(jadwal)
+    kursi = pilihKursi(jadwal)
+    if konfirmasiPerubahan(pesanan, maskapai, jadwal, kursi):
+        pindahkanPesanan(daftarMaskapai, pesanan, maskapai, jadwal, kursi)
+        return True
+    print('Perubahan dibatalkan.')
+    return False
+
+def ubahJadwal(daftarMaskapai, pesanan):
+    maskapai = cariMaskapaiByNama(daftarMaskapai, pesanan['maskapai'])
+    jadwal, kursi = pilihJadwalDanKursi(maskapai)
+    if jadwal == None:
+        return False
+    if konfirmasiPerubahan(pesanan, maskapai, jadwal, kursi):
+        pindahkanPesanan(daftarMaskapai, pesanan, maskapai, jadwal, kursi)
+        return True
+    print('Perubahan dibatalkan.')
+    return False
+
+def ubahMaskapai(daftarMaskapai, pesanan):
+    maskapai = pilihMaskapai(daftarMaskapai)
+    jadwal, kursi = pilihJadwalDanKursi(maskapai)
+    if jadwal == None:
+        return False
+    if konfirmasiPerubahan(pesanan, maskapai, jadwal, kursi):
+        pindahkanPesanan(daftarMaskapai, pesanan, maskapai, jadwal, kursi)
+        return True
+    print('Perubahan dibatalkan.')
+    return False
 daftarMaskapai = loadData('data/maskapai.json')
 daftarPesanan = loadData('data/pesanan.json')
 
@@ -251,6 +342,40 @@ while True:
             else:
                 print('Pemesanan dibatalkan.')
             kembaliKeMenu()
+    elif inputMenu == '4': # Edit an order
+        if len(daftarPesanan) == 0:
+            print('Belum ada pesanan.')
+        else:
+            kode = input('Masukkan kode tiket: ').strip().upper()
+            pesanan = cariPesanan(daftarPesanan, kode)
+            if pesanan == None:
+                print('Pesanan tidak ditemukan.')
+            else:
+                tampilkanTiket(pesanan)
+                print('Bagian yang ingin diubah:')
+                print('1. Nama Penumpang')
+                print('2. Maskapai')
+                print('3. Jadwal')
+                print('4. Kursi')
+                inputUbah = input('Masukkan pilihan (1-4): ')
+                berubah = False
+                if inputUbah == '1':
+                    berubah = ubahNama(pesanan)
+                elif inputUbah == '2':
+                    berubah = ubahMaskapai(daftarMaskapai, pesanan)
+                elif inputUbah == '3':
+                    berubah = ubahJadwal(daftarMaskapai, pesanan)
+                elif inputUbah == '4':
+                    berubah = ubahKursi(daftarMaskapai, pesanan)
+                else:
+                    print('Pilihan tidak valid.')
+
+                if berubah:
+                    simpanData('data/pesanan.json', daftarPesanan)
+                    simpanData('data/maskapai.json', daftarMaskapai)
+                    print('Pesanan berhasil diubah!')
+                    tampilkanTiket(pesanan)
+        kembaliKeMenu()
 
     elif inputMenu == '6': # Exit the program
         print('Terima kasih telah menggunakan Bookplane!')
