@@ -247,6 +247,16 @@ def ubahMaskapai(daftarMaskapai, pesanan):
         return True
     print('Perubahan dibatalkan.')
     return False
+
+def kosongkanKursi(daftarMaskapai, pesanan):
+    for m in daftarMaskapai:
+        if m['nama'] == pesanan['maskapai']:
+            for j in m['jadwal']:
+                if j['waktu'] == pesanan['jadwal']:
+                    if pesanan['kursi'] in j['kursi_terisi']:
+                        j['kursi_terisi'].remove(pesanan['kursi'])
+                    return
+
 daftarMaskapai = loadData('data/maskapai.json')
 daftarPesanan = loadData('data/pesanan.json')
 
@@ -342,6 +352,7 @@ while True:
             else:
                 print('Pemesanan dibatalkan.')
             kembaliKeMenu()
+
     elif inputMenu == '4': # Edit an order
         if len(daftarPesanan) == 0:
             print('Belum ada pesanan.')
@@ -375,6 +386,24 @@ while True:
                     simpanData('data/maskapai.json', daftarMaskapai)
                     print('Pesanan berhasil diubah!')
                     tampilkanTiket(pesanan)
+        kembaliKeMenu()
+
+    elif inputMenu == '5': # Cancel an order
+        kodeTiket = input('Masukkan kode tiket: ').strip().upper()
+        pesanan = cariPesanan(daftarPesanan, kodeTiket)
+
+        if pesanan is None:
+            print('Pesanan tidak ditemukan.')
+        else:
+            tampilkanTiket(pesanan)
+            if konfirmasi('Apakah Anda yakin ingin membatalkan pesanan ini?'):
+                kosongkanKursi(daftarMaskapai, pesanan)
+                daftarPesanan.remove(pesanan)
+                simpanData('data/pesanan.json', daftarPesanan)
+                simpanData('data/maskapai.json', daftarMaskapai)
+                print('Pesanan berhasil dibatalkan.')
+            else:
+                print('Pembatalan dibatalkan.')
         kembaliKeMenu()
 
     elif inputMenu == '6': # Exit the program
