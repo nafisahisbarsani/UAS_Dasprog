@@ -13,14 +13,6 @@ def tampilkanMaskapai(daftar):
     for i in range(len(daftar)):
         print(i + 1, daftar[i]['nama'], formatRupiah(daftar[i]['harga']))
 
-def urutMaskapai(daftar, kunci):
-    hasil = daftar.copy()
-    for i in range(len(hasil) - 1):
-        for j in range(len(hasil) - 1 - i):
-            if hasil[j][kunci] > hasil[j + 1][kunci]:
-                hasil[j], hasil[j + 1] = hasil[j + 1], hasil[j]
-    return hasil
-
 def tampilkanKodeMaskapai(daftar):
     print('DAFTAR KODE MASKAPAI')
     for m in daftar:
@@ -41,10 +33,10 @@ def quickSort(daftar, kunci):
     kanan = []
     for m in daftar[1:]:
         if m[kunci] < pivot[kunci]:
-            kiri.append(m)
+            kiri.append(m)  
         else:
             kanan.append(m)
-    return quickSort(kiri, kunci) + [pivot] + quickSort(kanan, kunci)
+    return quickSort(kiri, kunci) + [pivot] + quickSort(kanan, kunci)   
 
 def binarySearchKode(daftar_terurut, kode):
     kiri = 0
@@ -246,9 +238,9 @@ while True:
         print('3. Tanpa Urutan')
         inputUrut = input('Masukkan pilihan (1-3): ')
         if inputUrut == '1':
-            tampilkanMaskapai(urutMaskapai(daftarMaskapai, 'nama'))
+            tampilkanMaskapai(quickSort(daftarMaskapai, 'nama'))
         elif inputUrut == '2':
-            tampilkanMaskapai(urutMaskapai(daftarMaskapai, 'harga'))
+            tampilkanMaskapai(quickSort(daftarMaskapai, 'harga'))
         elif inputUrut == '3':
             tampilkanMaskapai(daftarMaskapai)
         else:

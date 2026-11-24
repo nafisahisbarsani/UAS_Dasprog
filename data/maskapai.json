@@ -96,9 +96,7 @@
     "jadwal": [
       {
         "waktu": "05:45",
-        "kursi_terisi": [
-          "D1"
-        ]
+        "kursi_terisi": []
       },
       {
         "waktu": "10:20",
